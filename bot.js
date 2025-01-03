@@ -3,6 +3,27 @@ const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const db = require('./db'); // SQLite DB connection
 
+const { exec } = require('child_process');
+
+// Run `server.js` and `deploy-commands.js` as separate processes
+exec('node server.js', (error, stdout, stderr) => {
+    if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+});
+
+exec('node deploy-commands.js', (error, stdout, stderr) => {
+    if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+    }
+    console.log(`stdout: ${stdout}`);
+    console.error(`stderr: ${stderr}`);
+});
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
