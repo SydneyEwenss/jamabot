@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <!-- Link to the external CSS file -->
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+    <h1>Leaderboard</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Level</th>
+                <th>XP</th>
+                <th>Messages Sent</th>
+                <th>Voice Time (s)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach((user, index) => { %>
+            <tr>
+                <td><%= index + 1 %></td>
+                <td><%= user.username %></td>
+                <td><%= user.level %></td>
+                <td><%= user.xp %></td>
+                <td><%= user.messagesSent %></td>
+                <td><%= user.voiceTime %></td>
+            </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+</body>
+</html>
