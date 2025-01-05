@@ -3,7 +3,7 @@ const db = require('./db'); // SQLite DB connection
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = 3005;
 
 // Serve static files (like CSS, JS, images) from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));

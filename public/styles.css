@@ -6,31 +6,41 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     flex-direction: column;
-    overflow: hidden; /* Prevent overall page scrolling */
+    min-height: 100vh; /* Ensure body height covers the viewport */
     box-sizing: border-box;
 }
 
+/* Page Wrapper for Sticky Layout */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Allow table-container to fill available space */
+    width: 100%;
+}
+
+/* Header Section */
 h1 {
     color: #F49AC1; /* Highlight color for title */
-    margin-bottom: 20px;
-    margin-top: 20px; /* Prevent cutoff */
-    font-size: 28px;
+    margin: 20px 0;
+    text-align: center;
 }
 
 /* Table Container for Scroll */
-table {
-    width: 80%;
+.table-container {
+    width: 90%;
     max-width: 1200px;
     overflow-y: auto;
-    max-height: 70vh; /* Increased height to prevent clipping */
-    margin: 20px auto;
+    flex-grow: 1; /* Ensure this container grows and scrolls as needed */
+    margin: 0 auto;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     background-color: #1E1E1E; /* Dark background for table container */
+}
+
+/* Adjust height dynamically */
+.table-container {
+    max-height: calc(100vh - 180px); /* Space for the header and advertisement */
 }
 
 /* Table Styling */
@@ -64,6 +74,33 @@ tr:hover {
     background-color: #333333; /* Highlight row on hover */
 }
 
+/* Advertisement Styling (Sticky Footer) */
+.advertisement {
+    text-align: center;
+    margin: 0 auto;
+    padding: 10px 15px;
+    width: 100%;
+    max-width: 600px;
+    background-color: #1E1E1E; /* Match dark mode theme */
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.4); /* Shadow on top for footer */
+    color: #F49AC1; /* Highlight color */
+    font-size: 16px;
+    position: sticky; /* Sticky positioning for the ad */
+    bottom: 20px; /* Hover above the bottom of the screen */
+}
+
+.advertisement a {
+    color: #7aa6f9; /* Link color */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.advertisement a:hover {
+    color: #ffb0cd; /* Hover effect for links */
+}
+
+
 /* Scrollbar Styling */
 .table-container::-webkit-scrollbar {
     width: 8px;
@@ -90,6 +127,14 @@ tr:hover {
 
     h1 {
         font-size: 24px;
+    }
+
+    .table-container {
+        max-height: calc(100vh - 150px); /* Adjust for smaller screens */
+    }
+
+    .advertisement {
+        font-size: 14px;
     }
 }
 

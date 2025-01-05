@@ -9,32 +9,40 @@
 </head>
 <body>
 
-    <h1>Leaderboard</h1>
+    <div class="page-wrapper">
+        <h1>Leaderboard</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>User</th>
-                <th>Level</th>
-                <th>XP</th>
-                <th>Messages Sent</th>
-                <th>Voice Time (s)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% users.forEach((user, index) => { %>
-            <tr>
-                <td><%= index + 1 %></td>
-                <td><%= user.username %></td>
-                <td><%= user.level %></td>
-                <td><%= user.xp %></td>
-                <td><%= user.messagesSent %></td>
-                <td><%= user.voiceTime %></td>
-            </tr>
-            <% }) %>
-        </tbody>
-    </table>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>User</th>
+                        <th>Level</th>
+                        <th>XP</th>
+                        <th>Messages Sent</th>
+                        <th>Voice Time (s)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach((user, index) => { %>
+                    <tr>
+                        <td><%= index + 1 %></td>
+                        <td><%= user.username %></td>
+                        <td><%= user.level %></td>
+                        <td><%= user.xp %></td>
+                        <td><%= user.messagesSent %></td>
+                        <td><%= user.voiceTime %></td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
+    <div class="advertisement">
+        <p>Like the leaderboard? Check out my <a href="https://twitch.tv/sydderslmao" target="_blank">Twitch channel!</a></p>
+    </div>
+    
 </body>
 </html>
