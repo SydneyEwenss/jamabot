@@ -108,12 +108,12 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     if (oldState.channelId !== newState.channelId) {
         const userId = newState.member.id;
 
-        // If user joins a voice channel, start tracking time
+        // If the user joins a voice channel, start tracking time
         if (newState.channelId) {
             db.run('UPDATE users SET voiceStart = ? WHERE userId = ?', [Date.now(), userId]);
         }
 
-        // If user leaves a voice channel, calculate time spent
+        // If the user leaves a voice channel, calculate time spent and award XP
         if (oldState.channelId) {
             db.get('SELECT voiceStart FROM users WHERE userId = ?', [userId], (err, row) => {
                 if (err) {
@@ -122,12 +122,24 @@ client.on('voiceStateUpdate', (oldState, newState) => {
                 }
 
                 if (row && row.voiceStart) {
-                    const timeSpent = Math.floor((Date.now() - row.voiceStart) / 1000); // Time in seconds
-                    db.run('UPDATE users SET voiceTime = voiceTime + ? WHERE userId = ?', [timeSpent, userId]);
+                    // Calculate time spent in the voice channel in seconds
+                    const timeSpentInSeconds = Math.floor((Date.now() - row.voiceStart) / 1000); // Convert ms to seconds
+                    
+                    if (timeSpentInSeconds > 0) {
+                        // Calculate minutes spent, and award XP for each full minute (1 XP per minute)
+                        const minutesSpent = Math.floor(timeSpentInSeconds / 60); // Get full minutes spent
+
+                        // Award XP for each full minute spent in voice
+                        if (minutesSpent > 0) {
+                            db.run('UPDATE users SET voiceTime = voiceTime + ?, xp = xp + ? WHERE userId = ?', [timeSpentInSeconds, minutesSpent, userId]);
+                            console.log(`User ${userId} spent ${minutesSpent} minutes in voice chat and gained ${minutesSpent} XP.`);
+                        }
+                    }
                 }
             });
         }
     }
 });
+
 
 client.login(TOKEN); // Log in using the token from .env
