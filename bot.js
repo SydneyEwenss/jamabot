@@ -148,44 +148,5 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 });
 
 
-// Function to check and update the XP based on the voice time already tracked in the database
-const updateVoiceXP = () => {
-    // Retrieve all users from the database
-    db.all('SELECT userId, voiceTime, xp, level FROM users', (err, rows) => {
-        if (err) {
-            console.error('Error retrieving users from database:', err);
-            return;
-        }
-
-        // Loop through all users
-        rows.forEach((user) => {
-            // Calculate the total XP based on voice time
-            const timeSpentInSeconds = user.voiceTime; // Total voice time stored in seconds
-            const minutesSpent = Math.floor(timeSpentInSeconds / 60); // Convert seconds to full minutes
-
-            if (minutesSpent > 0) {
-                // Update the XP in the database for the user based on their voice time (1 XP per minute)
-                db.run('UPDATE users SET xp = xp + ? WHERE userId = ?', [minutesSpent, user.userId], (updateErr) => {
-                    if (updateErr) {
-                        console.error(`Error updating XP for user ${user.userId}:`, updateErr);
-                    } else {
-                        console.log(`User ${user.userId} has been awarded ${minutesSpent} XP for voice time.`);
-
-                        // Level-up logic
-                        if (user.xp + minutesSpent >= user.level * 100) {
-                            db.run('UPDATE users SET level = level + 1, xp = 0 WHERE userId = ?', [user.userId]);
-                            console.log(`User ${user.userId} leveled up!`);
-                        }
-                    }
-                });
-            }
-        });
-    });
-};
-
-// Call the function to update XP for all users based on their stored voice time
-updateVoiceXP();
-
-
 
 client.login(TOKEN); // Log in using the token from .env
