@@ -16,7 +16,7 @@ module.exports = {
 
                 // Create an embed for the top 10 users
                 const leaderboardEmbed = {
-                    color: 0x4CAF50, // Green color for the embed
+                    color: 0xF49AC1, // Green color for the embed
                     title: 'Top 10 Users by Level',
                     fields: rows.map((user, index) => ({
                         name: `${index + 1}. ${user.username}`,
