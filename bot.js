@@ -107,39 +107,85 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     // Track when the user joins or leaves a voice channel
     if (oldState.channelId !== newState.channelId) {
         const userId = newState.member.id;
+        const username = newState.member.user.username;
 
-        // If the user joins a voice channel, start tracking time
+        // If user joins a voice channel, start tracking time
         if (newState.channelId) {
             db.run('UPDATE users SET voiceStart = ? WHERE userId = ?', [Date.now(), userId]);
         }
 
-        // If the user leaves a voice channel, calculate time spent and award XP
+        // If user leaves a voice channel, calculate time spent
         if (oldState.channelId) {
-            db.get('SELECT voiceStart FROM users WHERE userId = ?', [userId], (err, row) => {
+            db.get('SELECT voiceStart, xp, level FROM users WHERE userId = ?', [userId], (err, row) => {
                 if (err) {
                     console.error(err);
                     return;
                 }
 
                 if (row && row.voiceStart) {
-                    // Calculate time spent in the voice channel in seconds
-                    const timeSpentInSeconds = Math.floor((Date.now() - row.voiceStart) / 1000); // Convert ms to seconds
-                    
-                    if (timeSpentInSeconds > 0) {
-                        // Calculate minutes spent, and award XP for each full minute (1 XP per minute)
-                        const minutesSpent = Math.floor(timeSpentInSeconds / 60); // Get full minutes spent
+                    const timeSpent = Math.floor((Date.now() - row.voiceStart) / 1000); // Time in seconds
+                    db.run('UPDATE users SET voiceTime = voiceTime + ? WHERE userId = ?', [timeSpent, userId]);
 
-                        // Award XP for each full minute spent in voice
-                        if (minutesSpent > 0) {
-                            db.run('UPDATE users SET voiceTime = voiceTime + ?, xp = xp + ? WHERE userId = ?', [timeSpentInSeconds, minutesSpent, userId]);
-                            console.log(`User ${userId} spent ${minutesSpent} minutes in voice chat and gained ${minutesSpent} XP.`);
+                    // Add XP based on time spent (1 XP per minute)
+                    const minutesSpent = Math.floor(timeSpent / 60);
+                    db.run('UPDATE users SET xp = xp + ? WHERE userId = ?', [minutesSpent, userId], (updateErr) => {
+                        if (updateErr) {
+                            console.error(updateErr);
+                        } else {
+                            console.log(`User ${username} has been awarded ${minutesSpent} XP for voice time.`);
+                            
+                            // Level-up logic
+                            if (row.xp + minutesSpent >= row.level * 100) {
+                                db.run('UPDATE users SET level = level + 1, xp = 0 WHERE userId = ?', [userId]);
+                                console.log(`User ${username} leveled up!`);
+                            }
                         }
-                    }
+                    });
                 }
             });
         }
     }
 });
+
+
+// Function to check and update the XP based on the voice time already tracked in the database
+const updateVoiceXP = () => {
+    // Retrieve all users from the database
+    db.all('SELECT userId, voiceTime, xp, level FROM users', (err, rows) => {
+        if (err) {
+            console.error('Error retrieving users from database:', err);
+            return;
+        }
+
+        // Loop through all users
+        rows.forEach((user) => {
+            // Calculate the total XP based on voice time
+            const timeSpentInSeconds = user.voiceTime; // Total voice time stored in seconds
+            const minutesSpent = Math.floor(timeSpentInSeconds / 60); // Convert seconds to full minutes
+
+            if (minutesSpent > 0) {
+                // Update the XP in the database for the user based on their voice time (1 XP per minute)
+                db.run('UPDATE users SET xp = xp + ? WHERE userId = ?', [minutesSpent, user.userId], (updateErr) => {
+                    if (updateErr) {
+                        console.error(`Error updating XP for user ${user.userId}:`, updateErr);
+                    } else {
+                        console.log(`User ${user.userId} has been awarded ${minutesSpent} XP for voice time.`);
+
+                        // Level-up logic
+                        if (user.xp + minutesSpent >= user.level * 100) {
+                            db.run('UPDATE users SET level = level + 1, xp = 0 WHERE userId = ?', [user.userId]);
+                            console.log(`User ${user.userId} leveled up!`);
+                        }
+                    }
+                });
+            }
+        });
+    });
+};
+
+// Call the function to update XP for all users based on their stored voice time
+updateVoiceXP();
+
 
 
 client.login(TOKEN); // Log in using the token from .env
